@@ -39,14 +39,10 @@ export default function RegistrarMovimiento() {
   }, []);
 
   async function cargarGastosFijos() {
-    const { familiaId } = useApp();
-    if (!familiaId) return;
-
     const { data } = await supabase
       .from('gastos_fijos_plantilla')
       .select('*')
       .eq('activo', true)
-      .eq('familia_id', familiaId)
       .order('nombre');
 
     if (data) {

@@ -1,13 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { useApp } from '../context/AppContext';
 import { Usuario } from '../types';
 import { formatMontoInput, parseMontoInput } from '../lib/formatMonto';
 import './Configuracion.css';
 
 export default function Configuracion() {
-  const { currentUser, users, switchToFamilyMember } = useApp();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [fotoInicio, setFotoInicio] = useState('');
   const [presupuestoMensual, setPresupuestoMensual] = useState('');
@@ -31,14 +29,11 @@ export default function Configuracion() {
   }, [location]);
 
   async function cargarDatos() {
-    if (!currentUser?.familia_id) return;
-
     setLoading(true);
 
     const { data: usuariosData } = await supabase
       .from('usuarios')
       .select('*')
-      .eq('familia_id', currentUser.familia_id)
       .order('nombre');
 
     const { data: fotoData } = await supabase
@@ -164,36 +159,6 @@ export default function Configuracion() {
     <div className="configuracion">
       <div className="config-header">
         <h1>Configuración</h1>
-      </div>
-
-      <div className="config-section">
-        <h2>Perfil activo</h2>
-        <p className="section-description">
-          Estás usando la app como <strong>{currentUser?.nombre}</strong>. Podés cambiar entre los miembros de tu familia.
-        </p>
-        <div className="family-members-grid">
-          {users.map(user => (
-            <button
-              key={user.id}
-              className={`family-member-card ${currentUser?.id === user.id ? 'active' : ''}`}
-              onClick={() => switchToFamilyMember(user.id)}
-            >
-              <div className="member-avatar">
-                {user.foto_url ? (
-                  <img src={user.foto_url} alt={user.nombre} />
-                ) : (
-                  <div className="avatar-placeholder">
-                    {user.nombre.charAt(0)}
-                  </div>
-                )}
-              </div>
-              <div className="member-name">{user.nombre}</div>
-              {currentUser?.id === user.id && (
-                <div className="active-badge">Activo</div>
-              )}
-            </button>
-          ))}
-        </div>
       </div>
 
       <div

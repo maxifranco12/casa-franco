@@ -96,7 +96,7 @@ export default function GastosFijos() {
   }
 
   async function crearPlantilla() {
-    if (!formPlantilla.nombre.trim() || !currentUser?.familia_id) return;
+    if (!formPlantilla.nombre.trim()) return;
 
     const { error } = await supabase
       .from('gastos_fijos_plantilla')
@@ -105,8 +105,7 @@ export default function GastosFijos() {
         monto_estimado: formPlantilla.monto_estimado ? parseMontoInput(formPlantilla.monto_estimado) : 0,
         dia_pago: formPlantilla.dia_pago,
         dia_vencimiento: formPlantilla.dia_vencimiento ? parseInt(formPlantilla.dia_vencimiento) : null,
-        activo: true,
-        familia_id: currentUser.familia_id
+        activo: true
       });
 
     if (!error) {

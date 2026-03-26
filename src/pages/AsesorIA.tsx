@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { useApp } from '../context/AppContext';
 import './AsesorIA.css';
 
 interface Message {
@@ -30,19 +29,6 @@ export default function AsesorIA() {
   }, [messages]);
 
   async function getContextData() {
-    const { familiaId } = useApp();
-    if (!familiaId) {
-      return {
-        gastosVariables: [],
-        gastosFijos: [],
-        gastosFijosPlantilla: [],
-        gastosVariablesMesPasado: [],
-        gastosFijosMesPasado: [],
-        mesActual: 0,
-        anioActual: 0
-      };
-    }
-
     const hoy = new Date();
     const mesActual = hoy.getMonth() + 1;
     const anioActual = hoy.getFullYear();
@@ -63,8 +49,7 @@ export default function AsesorIA() {
     const { data: gastosFijosPlantilla } = await supabase
       .from('gastos_fijos_plantilla')
       .select('*')
-      .eq('activo', true)
-      .eq('familia_id', familiaId);
+      .eq('activo', true);
 
     const mesPasado = mesActual === 1 ? 12 : mesActual - 1;
     const anioPasado = mesActual === 1 ? anioActual - 1 : anioActual;

@@ -1,19 +1,8 @@
-export interface Familia {
-  id: string;
-  nombre_familia: string;
-  plan: string;
-  created_at: string;
-  foto_url?: string | null;
-  activo: boolean;
-}
-
 export interface Usuario {
   id: string;
   nombre: string;
   foto_url?: string | null;
   created_at: string;
-  familia_id?: string;
-  email?: string | null;
 }
 
 export interface GastoFijoPlantilla {

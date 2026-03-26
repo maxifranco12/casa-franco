@@ -55,7 +55,7 @@
   width: calc(100% - 48px);
   margin: 0 24px 24px;
   padding: 16px;
-  background: #10B981;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 12px;
@@ -63,13 +63,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 2px 8px rgba(45, 55, 72, 0.2);
 }
 
 .registrar-gasto-btn:hover {
-  background: #059669;
+  background: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 12px rgba(45, 55, 72, 0.3);
 }
 
 .registrar-gasto-btn:active {

@@ -6,7 +6,6 @@ import { GastoFijoMes, Movimiento, GastoFijoPlantilla } from '../types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import InteligenciaFinanciera from '../components/InteligenciaFinanciera';
 import VistaAnual from '../components/VistaAnual';
-import { useApp } from '../context/AppContext';
 import './Dashboard.css';
 
 interface GastoPorCategoria {
@@ -21,7 +20,6 @@ interface GastoMensual {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { familiaId } = useApp();
   const [gastosPendientes, setGastosPendientes] = useState<GastoFijoMes[]>([]);
   const [ultimosMovimientos, setUltimosMovimientos] = useState<Movimiento[]>([]);
   const [estadisticas, setEstadisticas] = useState({
@@ -96,13 +94,10 @@ export default function Dashboard() {
   }
 
   async function cargarFotoInicio() {
-    if (!familiaId) return;
-
     const { data } = await supabase
       .from('configuracion')
       .select('valor')
       .eq('clave', 'foto_inicio')
-      .eq('familia_id', familiaId)
       .maybeSingle();
 
     if (data?.valor) {
@@ -111,13 +106,10 @@ export default function Dashboard() {
   }
 
   async function cargarPresupuestoMensual() {
-    if (!familiaId) return;
-
     const { data } = await supabase
       .from('configuracion')
       .select('presupuesto_mensual')
       .eq('clave', 'foto_inicio')
-      .eq('familia_id', familiaId)
       .maybeSingle();
 
     if (data?.presupuesto_mensual) {
@@ -391,13 +383,10 @@ export default function Dashboard() {
   }
 
   async function cargarGastosProximosVencer() {
-    if (!familiaId) return;
-
     const { data } = await supabase
       .from('gastos_fijos_plantilla')
       .select('*')
-      .eq('activo', true)
-      .eq('familia_id', familiaId);
+      .eq('activo', true);
 
     if (data) {
       const gastosConDias = data

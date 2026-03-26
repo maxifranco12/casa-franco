@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
-import Registro from './pages/Registro';
 import Dashboard from './pages/Dashboard';
 import GastosFijos from './pages/GastosFijos';
 import Caja from './pages/Caja';
@@ -25,7 +24,6 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/registro" element={<Registro />} />
       <Route
         path="/"
         element={
