@@ -1,0 +1,280 @@
+.caja {
+  padding-bottom: 80px;
+}
+
+.caja-header {
+  padding: 16px 16px 24px;
+  background: linear-gradient(135deg, var(--secondary) 0%, #3BA65C 100%);
+  color: white;
+  margin-bottom: 24px;
+}
+
+.caja-header h1 {
+  font-size: 28px;
+  margin-bottom: 4px;
+  margin-top: 8px;
+}
+
+.caja-header p {
+  opacity: 0.95;
+  font-size: 15px;
+}
+
+.caja-saldo-hero {
+  background: var(--surface);
+  padding: 32px 24px;
+  margin: 0 16px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border: 3px solid #4CAF50;
+}
+
+.saldo-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.saldo-info {
+  text-align: center;
+}
+
+.saldo-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.saldo-valor {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.caja-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 0 16px;
+  margin-bottom: 24px;
+}
+
+.caja-stat {
+  background: var(--surface);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.caja-stat.ingreso {
+  border-top: 3px solid var(--secondary);
+}
+
+.caja-stat.egreso {
+  border-top: 3px solid var(--danger);
+}
+
+.caja-stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.caja-stat-valor {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.caja-stat.ingreso .caja-stat-valor {
+  color: var(--secondary);
+}
+
+.caja-stat.egreso .caja-stat-valor {
+  color: var(--danger);
+}
+
+.caja-filtros {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px;
+  margin-bottom: 24px;
+}
+
+.filtro-btn {
+  flex: 1;
+  padding: 10px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.filtro-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+  transform: translateY(-1px);
+}
+
+.movimientos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.movimiento-card {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.movimiento-card.ingreso {
+  border-left: 4px solid var(--secondary);
+}
+
+.movimiento-card.egreso {
+  border-left: 4px solid var(--danger);
+}
+
+.movimiento-card.transferencia {
+  border-left: 4px solid #9C27B0;
+}
+
+.movimiento-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.delete-btn {
+  background: none;
+  color: var(--danger);
+  padding: 6px;
+  border-radius: 6px;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.delete-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.badge-ingreso {
+  background-color: #D4EDDA;
+  color: #155724;
+}
+
+.badge-egreso {
+  background-color: #F8D7DA;
+  color: #721C24;
+}
+
+.badge-transferencia {
+  background-color: #E1BEE7;
+  color: #6A1B9A;
+}
+
+.movimiento-fecha {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.movimiento-body h3 {
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.movimiento-categoria {
+  font-size: 14px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.movimiento-detalles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.movimiento-nota {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--background);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.movimiento-monto {
+  margin-top: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.movimiento-monto.ingreso {
+  color: var(--secondary);
+}
+
+.movimiento-monto.egreso {
+  color: var(--danger);
+}
+
+.movimiento-monto.transferencia {
+  color: #9C27B0;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 40px 20px;
+}
+
+.medio-pago-section {
+  margin-bottom: 32px;
+}
+
+.medio-pago-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--background);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+}
+
+@media (min-width: 768px) {
+  .saldo-valor {
+    font-size: 42px;
+  }
+
+  .caja-stats {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
+  }
+}

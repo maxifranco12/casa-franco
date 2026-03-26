@@ -1,0 +1,386 @@
+.inteligencia-financiera {
+  padding: 0 16px 24px;
+}
+
+.if-titulo {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.if-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.if-card {
+  background: var(--surface);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px var(--shadow);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.if-card:hover {
+  box-shadow: 0 4px 16px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.estado-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.estado-badge.excelente {
+  background: rgba(56, 161, 105, 0.15);
+  color: #38A169;
+}
+
+.estado-badge.moderado {
+  background: rgba(236, 201, 75, 0.15);
+  color: #D69E2E;
+}
+
+.estado-badge.atención {
+  background: rgba(237, 137, 54, 0.15);
+  color: #ED8936;
+}
+
+.estado-badge.crítico {
+  background: rgba(229, 62, 62, 0.15);
+  color: #E53E3E;
+}
+
+.termometro-visual {
+  margin-bottom: 20px;
+}
+
+.termometro-barra {
+  height: 12px;
+  background: var(--background);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.termometro-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.termometro-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.porcentaje {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.texto-secundario {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stat-value.disponible {
+  color: var(--secondary);
+}
+
+.ahorro-card {
+  text-align: center;
+}
+
+.ahorro-card.positivo {
+  background: linear-gradient(135deg, rgba(56, 161, 105, 0.05) 0%, rgba(56, 161, 105, 0.1) 100%);
+  border-color: rgba(56, 161, 105, 0.3);
+}
+
+.ahorro-card.negativo {
+  background: linear-gradient(135deg, rgba(229, 62, 62, 0.05) 0%, rgba(229, 62, 62, 0.1) 100%);
+  border-color: rgba(229, 62, 62, 0.3);
+}
+
+.ahorro-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ahorro-icon {
+  font-size: 40px;
+}
+
+.ahorro-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ahorro-monto {
+  margin: 20px 0;
+}
+
+.ahorro-monto span {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ahorro-card.positivo .ahorro-monto span {
+  color: #38A169;
+}
+
+.ahorro-card.negativo .ahorro-monto span {
+  color: #E53E3E;
+}
+
+.comparacion-mes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.flecha {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.flecha.subida {
+  color: #E53E3E;
+}
+
+.flecha.bajada {
+  color: #38A169;
+}
+
+.racha-card {
+  background: linear-gradient(135deg, rgba(245, 132, 50, 0.05) 0%, rgba(245, 132, 50, 0.1) 100%);
+  border-color: rgba(245, 132, 50, 0.3);
+}
+
+.racha-content {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.racha-emoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.racha-texto {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.consejo-card {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(234, 179, 8, 0.15) 100%);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.consejo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.consejo-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.consejo-icon {
+  font-size: 24px;
+}
+
+.consejo-contenido {
+  padding: 16px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.consejo-contenido p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0;
+}
+
+.btn-consejo {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-consejo:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.btn-consejo:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.proyeccion-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.proyeccion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--background);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+
+.proyeccion-item:last-child {
+  margin-bottom: 0;
+}
+
+.proyeccion-item.positiva {
+  background: linear-gradient(135deg, rgba(56, 161, 105, 0.05) 0%, rgba(56, 161, 105, 0.1) 100%);
+  border-color: rgba(56, 161, 105, 0.3);
+}
+
+.proyeccion-item.negativa {
+  background: linear-gradient(135deg, rgba(229, 62, 62, 0.05) 0%, rgba(229, 62, 62, 0.1) 100%);
+  border-color: rgba(229, 62, 62, 0.3);
+}
+
+.proyeccion-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.proyeccion-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.proyeccion-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.proyeccion-valor {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.proyeccion-item.positiva .proyeccion-valor {
+  color: #38A169;
+}
+
+.proyeccion-item.negativa .proyeccion-valor {
+  color: #E53E3E;
+}
+
+@media (min-width: 768px) {
+  .if-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .termometro-card {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .if-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .termometro-card {
+    grid-column: span 2;
+  }
+
+  .proyeccion-card {
+    grid-column: span 3;
+  }
+}

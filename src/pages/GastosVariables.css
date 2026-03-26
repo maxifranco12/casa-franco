@@ -1,0 +1,174 @@
+.gastos-variables {
+  padding-bottom: 80px;
+}
+
+.gastos-total-card {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  margin: 0 24px 24px;
+  padding: 32px;
+  border-radius: 16px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.total-label {
+  font-size: 16px;
+  margin-bottom: 8px;
+  opacity: 0.95;
+}
+
+.total-valor {
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.categorias-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 0 24px;
+  margin-bottom: 32px;
+}
+
+.categoria-card {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px var(--shadow);
+  text-align: center;
+}
+
+.categoria-nombre {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.categoria-total {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.registrar-gasto-btn {
+  width: calc(100% - 48px);
+  margin: 0 24px 24px;
+  padding: 16px;
+  background: #10B981;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.registrar-gasto-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.registrar-gasto-btn:active {
+  transform: translateY(0);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+.categoria-filter {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  min-width: 180px;
+}
+
+.gastos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gasto-item {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid var(--danger);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.gasto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.gasto-categoria {
+  background: rgba(74, 144, 226, 0.1);
+  color: var(--primary);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.gasto-fecha {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.gasto-item h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.gasto-detalles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.gasto-nota {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--background);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.gasto-monto {
+  margin-top: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--danger);
+  text-align: right;
+}
+
+@media (min-width: 768px) {
+  .categorias-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .total-valor {
+    font-size: 56px;
+  }
+}
