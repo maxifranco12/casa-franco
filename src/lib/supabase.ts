@@ -8,3 +8,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+```
+
+Commit. Después en Bolt tirá:
+```
+git pull origin main --force
