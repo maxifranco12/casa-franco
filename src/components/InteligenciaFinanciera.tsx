@@ -12,10 +12,7 @@ export default function InteligenciaFinanciera({ presupuestoMensual }: Props) {
   const [gastosFijos, setGastosFijos] = useState(0);
   const [gastosVariables, setGastosVariables] = useState(0);
   const [gastoMesAnterior, setGastoMesAnterior] = useState(0);
-  const [consejoIA, setConsejoIA] = useState('');
-  const [cargandoConsejo, setCargandoConsejo] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [categoriasDesglose, setCategoriasDesglose] = useState<{[key: string]: number}>({});
 
   const gastadoRef = useRef<HTMLSpanElement>(null);
   const disponibleRef = useRef<HTMLSpanElement>(null);
@@ -71,19 +68,12 @@ export default function InteligenciaFinanciera({ presupuestoMensual }: Props) {
     const totalFijos = fijosPagados?.reduce((sum, p) => sum + Number(p.monto), 0) || 0;
     const totalVariables = variablesData?.reduce((sum, m) => sum + Number(m.monto), 0) || 0;
 
-    const desglose: {[key: string]: number} = {};
-    variablesData?.forEach(m => {
-      const cat = m.categoria || 'Sin categoría';
-      desglose[cat] = (desglose[cat] || 0) + Number(m.monto);
-    });
-
     const totalAnteriorVariables = mesAnteriorData?.reduce((sum, m) => sum + Number(m.monto), 0) || 0;
     const totalAnteriorFijos = fijosAnterior?.reduce((sum, p) => sum + Number(p.monto), 0) || 0;
 
     setGastosFijos(totalFijos);
     setGastosVariables(totalVariables);
     setGastoMesAnterior(totalAnteriorVariables + totalAnteriorFijos);
-    setCategoriasDesglose(desglose);
     setLoading(false);
 
     setTimeout(() => {
@@ -110,74 +100,6 @@ export default function InteligenciaFinanciera({ presupuestoMensual }: Props) {
         animateCounter(ahorro6mesesRef.current, Math.max(0, ahorro6Meses), 1200);
       }
     }, 100);
-  }
-
-  async function obtenerConsejoIA() {
-    const mesActual = new Date().toISOString().slice(0, 7);
-    const cacheKey = `consejo_mes_${mesActual}`;
-
-    const cached = localStorage.getItem(cacheKey);
-    if (cached) {
-      setConsejoIA(cached);
-      return;
-    }
-
-    setCargandoConsejo(true);
-
-    const totalGastado = gastosFijos + gastosVariables;
-    const diferenciaMesAnterior = totalGastado - gastoMesAnterior;
-    const porcentajeCambio = gastoMesAnterior > 0
-      ? ((diferenciaMesAnterior / gastoMesAnterior) * 100).toFixed(1)
-      : '0';
-
-    const categoriasTexto = Object.entries(categoriasDesglose)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([cat, monto]) => `${cat}: ${formatCurrency(monto)}`)
-      .join(', ');
-
-    const prompt = `Sos un asesor financiero familiar. Analizá estos datos del mes y dá UN consejo corto, concreto y motivador en español rioplatense (máximo 3 líneas). Datos:
-- Presupuesto mensual: ${formatCurrency(presupuestoMensual)}
-- Gastado este mes: ${formatCurrency(totalGastado)}
-- Gastos fijos: ${formatCurrency(gastosFijos)}
-- Gastos variables: ${formatCurrency(gastosVariables)}
-- Categorías principales: ${categoriasTexto}
-- Cambio vs mes anterior: ${diferenciaMesAnterior >= 0 ? '+' : ''}${formatCurrency(diferenciaMesAnterior)} (${porcentajeCambio}%)
-
-Sé específico con números reales y directo.`;
-
-    try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-ia`;
-      console.log('Calling URL:', apiUrl);
-      console.log('Anon key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
-
-      const headers = {
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-      };
-
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          systemPrompt: "Sos un asesor financiero familiar argentino. Respondé en español rioplatense, máximo 3 líneas, concreto y motivador.",
-          messages: [{ role: "user", content: prompt }]
-        })
-      });
-
-      console.log('Response status:', response.status);
-      const data = await response.json();
-      console.log('Response data:', data);
-      const consejo = data.content?.[0]?.text || 'No se pudo obtener un consejo en este momento.';
-
-      setConsejoIA(consejo);
-      localStorage.setItem(cacheKey, consejo);
-    } catch (error) {
-      console.error('Error obteniendo consejo IA:', error);
-      setConsejoIA('No se pudo conectar con el asesor IA. Intentá más tarde.');
-    }
-
-    setCargandoConsejo(false);
   }
 
   if (loading) {
@@ -294,27 +216,6 @@ Sé específico con números reales y directo.`;
               </>
             )}
           </div>
-        </div>
-
-        <div className="if-card consejo-card">
-          <div className="consejo-header">
-            <h3>Consejo personalizado</h3>
-            <span className="consejo-icon">🤖</span>
-          </div>
-
-          {consejoIA ? (
-            <div className="consejo-contenido">
-              <p>{consejoIA}</p>
-            </div>
-          ) : (
-            <button
-              className="btn-consejo"
-              onClick={obtenerConsejoIA}
-              disabled={cargandoConsejo}
-            >
-              {cargandoConsejo ? 'Analizando...' : 'Ver consejo del mes'}
-            </button>
-          )}
         </div>
 
         <div className="if-card proyeccion-card">
