@@ -6,6 +6,7 @@ import { Movimiento, MEDIOS_PAGO, CATEGORIAS_GASTOS } from '../types';
 import { formatMontoInput, parseMontoInput } from '../lib/formatMonto';
 import { useApp } from '../context/AppContext';
 import { showToast } from '../lib/toast';
+import { groupByWeek, calculateSpendingByPerson } from '../lib/insights';
 import './Caja.css';
 
 export default function Caja() {
@@ -25,6 +26,8 @@ export default function Caja() {
   const [refreshing, setRefreshing] = useState(false);
   const [mostrarHistorialSaldos, setMostrarHistorialSaldos] = useState(false);
   const [historialSaldos, setHistorialSaldos] = useState<any[]>([]);
+  const [weeklyBreakdown, setWeeklyBreakdown] = useState<Record<number, { total: number }>>({});
+  const [spendingByPerson, setSpendingByPerson] = useState<Record<string, number>>({});
 
   useEffect(() => {
     cargarDatos();
@@ -81,6 +84,14 @@ export default function Caja() {
 
     if (data) {
       setMovimientos(data);
+
+      if (filtroMes === 'actual') {
+        const weeks = groupByWeek(data);
+        setWeeklyBreakdown(weeks);
+
+        const spending = calculateSpendingByPerson(data);
+        setSpendingByPerson(spending);
+      }
     }
   }
 
@@ -314,6 +325,50 @@ export default function Caja() {
           Todos
         </button>
       </div>
+
+      {filtroMes === 'actual' && Object.keys(weeklyBreakdown).length > 0 && (
+        <div style={{ margin: '0 16px 24px', background: 'var(--surface)', padding: '16px', borderRadius: '12px', boxShadow: '0 2px 8px var(--shadow)' }}>
+          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Resumen semanal</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {Object.entries(weeklyBreakdown).map(([week, data]) => {
+              const weekNum = Number(week);
+              const startDay = (weekNum - 1) * 7 + 1;
+              const endDay = Math.min(weekNum * 7, new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate());
+              const monthName = new Date().toLocaleDateString('es-AR', { month: 'short' });
+              return (
+                <div key={week} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', background: 'var(--background)', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '14px' }}>Semana {week} ({startDay}-{endDay} {monthName})</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--danger)' }}>-{formatCurrency(data.total)}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {filtroMes === 'actual' && Object.keys(spendingByPerson).length > 0 && (
+        <div style={{ margin: '0 16px 24px', background: 'var(--surface)', padding: '16px', borderRadius: '12px', boxShadow: '0 2px 8px var(--shadow)' }}>
+          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Quién gasta más</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {Object.entries(spendingByPerson).map(([personId, amount]) => {
+              const user = users.find(u => u.id === personId);
+              const total = Object.values(spendingByPerson).reduce((a, b) => a + b, 0);
+              const percentage = total > 0 ? (amount / total) * 100 : 0;
+              return (
+                <div key={personId}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>{user?.nombre || 'Desconocido'}</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600' }}>{formatCurrency(amount)} ({percentage.toFixed(0)}%)</span>
+                  </div>
+                  <div style={{ height: '8px', background: '#E2E8F0', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${percentage}%`, background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)', transition: 'width 0.3s ease' }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="section">
         <h2>Historial de movimientos</h2>

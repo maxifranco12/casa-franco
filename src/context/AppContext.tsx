@@ -6,6 +6,7 @@ import { autoGenerateMonthlyFixedExpenses } from '../lib/autoGenerateFixedExpens
 import { subscribeToMovimientos, unsubscribeFromMovimientos } from '../lib/realtimeNotifications';
 import { closeMonthAndGenerateHistory } from '../lib/monthlyClosing';
 import { checkSessionTimeout, updateLastActivity } from '../lib/sessionCheck';
+import { scheduleDailyReminder, scheduleWeeklySummary } from '../lib/notifications';
 
 interface AppContextType {
   currentUser: Usuario | null;
@@ -38,6 +39,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } else {
       updateLastActivity();
     }
+
+    scheduleDailyReminder();
+    scheduleWeeklySummary();
   }, []);
 
   useEffect(() => {

@@ -68,14 +68,25 @@ export default function GastosFijos() {
     const { data } = await supabase
       .from('gastos_fijos_plantilla')
       .select('*')
-      .eq('activo', true)
-      .order('nombre');
+      .eq('activo', true);
 
     if (data) {
       const plantillasConDias = data.map(plantilla => ({
         ...plantilla,
         diasRestantes: calcularDiasRestantes(plantilla.dia_vencimiento)
       }));
+
+      plantillasConDias.sort((a, b) => {
+        if (a.diasRestantes === null && b.diasRestantes === null) return a.nombre.localeCompare(b.nombre);
+        if (a.diasRestantes === null) return 1;
+        if (b.diasRestantes === null) return -1;
+        if (a.diasRestantes === 0 && b.diasRestantes !== 0) return -1;
+        if (b.diasRestantes === 0 && a.diasRestantes !== 0) return 1;
+        if (a.diasRestantes <= 5 && b.diasRestantes > 5) return -1;
+        if (b.diasRestantes <= 5 && a.diasRestantes > 5) return 1;
+        return a.diasRestantes - b.diasRestantes;
+      });
+
       setPlantillas(plantillasConDias);
     }
   }
@@ -279,6 +290,27 @@ export default function GastosFijos() {
   function getUltimoPago(plantillaId: string): HistorialPagoGastoFijo | null {
     const pagos = historialMap[plantillaId];
     return pagos && pagos.length > 0 ? pagos[0] : null;
+  }
+
+  function calculateYearlyProgress(plantillaId: string): { paid: number; total: number; percentage: number } {
+    const currentYear = new Date().getFullYear();
+    const pagos = historialMap[plantillaId] || [];
+
+    const pagosEsteAnio = pagos.filter(p => p.anio === currentYear);
+
+    const mesesUnicos = new Set(pagosEsteAnio.map(p => p.mes));
+    const mesesPagados = mesesUnicos.size;
+
+    const currentMonth = new Date().getMonth() + 1;
+    const mesesTranscurridos = currentMonth;
+
+    const percentage = mesesTranscurridos > 0 ? (mesesPagados / mesesTranscurridos) * 100 : 0;
+
+    return {
+      paid: mesesPagados,
+      total: mesesTranscurridos,
+      percentage: Math.min(percentage, 100)
+    };
   }
 
   if (loading) {
@@ -507,6 +539,27 @@ export default function GastosFijos() {
                           </div>
                         )}
                       </div>
+
+                      {(() => {
+                        const progress = calculateYearlyProgress(plantilla.id);
+                        return (
+                          <div className="yearly-progress">
+                            <div className="progress-label">
+                              {progress.paid}/{progress.total} meses pagados este año
+                            </div>
+                            <div className="progress-bar">
+                              <div
+                                className="progress-fill"
+                                style={{
+                                  width: `${progress.percentage}%`,
+                                  background: progress.percentage >= 80 ? '#38A169' : progress.percentage >= 50 ? '#F59E0B' : '#E53E3E'
+                                }}
+                              />
+                            </div>
+                            <div className="progress-percentage">{progress.percentage.toFixed(0)}%</div>
+                          </div>
+                        );
+                      })()}
 
                       {historial.length > 0 && (
                         <details className="historial-detalle">

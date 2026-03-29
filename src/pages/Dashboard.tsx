@@ -7,6 +7,9 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis
 import InteligenciaFinanciera from '../components/InteligenciaFinanciera';
 import VistaAnual from '../components/VistaAnual';
 import MesesAnteriores from '../components/MesesAnteriores';
+import { SkeletonCard, SkeletonStats } from '../components/SkeletonLoader';
+import { calculateSavingsStreak, detectSmallExpenses, calculateProjectedSpending, getDaysElapsedInMonth, getDaysInMonth, getDaysRemainingInMonth } from '../lib/insights';
+import { saveToCache, getFromCache } from '../lib/cache';
 import './Dashboard.css';
 
 interface GastoPorCategoria {
@@ -48,6 +51,11 @@ export default function Dashboard() {
   const [vistaAnual, setVistaAnual] = useState(false);
   const [hayDatosMultiplesMeses, setHayDatosMultiplesMeses] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [savingsStreak, setSavingsStreak] = useState(0);
+  const [smallExpenses, setSmallExpenses] = useState({ total: 0, count: 0 });
+  const [projectedSpending, setProjectedSpending] = useState(0);
+  const [top3Expenses, setTop3Expenses] = useState<Movimiento[]>([]);
+  const [offlineMode, setOfflineMode] = useState(false);
 
   useEffect(() => {
     cargarDatos();
@@ -78,19 +86,38 @@ export default function Dashboard() {
 
   async function cargarDatos() {
     setLoading(true);
+    setOfflineMode(false);
 
-    await Promise.all([
-      cargarGastosPendientes(),
-      cargarUltimosMovimientos(),
-      calcularEstadisticas(),
-      cargarFotoInicio(),
-      cargarGastosPorCategoria(),
-      cargarEvolucionMensual(),
-      cargarResumenMes(),
-      cargarGastosProximosVencer(),
-      cargarGastosPorMedioPago(),
-      cargarPresupuestoMensual()
-    ]);
+    try {
+      await Promise.all([
+        cargarGastosPendientes(),
+        cargarUltimosMovimientos(),
+        calcularEstadisticas(),
+        cargarFotoInicio(),
+        cargarGastosPorCategoria(),
+        cargarEvolucionMensual(),
+        cargarResumenMes(),
+        cargarGastosProximosVencer(),
+        cargarGastosPorMedioPago(),
+        cargarPresupuestoMensual(),
+        cargarHistorialMeses(),
+        cargarSmartInsights()
+      ]);
+
+      saveToCache('dashboard_data', {
+        gastosPendientes,
+        ultimosMovimientos,
+        estadisticas,
+        gastosPorCategoria,
+        timestamp: Date.now()
+      });
+    } catch (error) {
+      console.error('Error loading data:', error);
+      const cached = getFromCache<any>('dashboard_data');
+      if (cached) {
+        setOfflineMode(true);
+      }
+    }
 
     setLoading(false);
   }
@@ -408,6 +435,50 @@ export default function Dashboard() {
     }
   }
 
+  async function cargarHistorialMeses() {
+    const { data } = await supabase
+      .from('historial_meses')
+      .select('*')
+      .order('anio', { ascending: false })
+      .order('mes', { ascending: false });
+
+    if (data) {
+      const streak = calculateSavingsStreak(data, presupuestoMensual);
+      setSavingsStreak(streak);
+    }
+  }
+
+  async function cargarSmartInsights() {
+    const startDate = new Date(anioFiltro, mesFiltro - 1, 1).toISOString().split('T')[0];
+    const endDate = new Date(anioFiltro, mesFiltro, 0).toISOString().split('T')[0];
+
+    const { data: movimientos } = await supabase
+      .from('movimientos')
+      .select('*')
+      .gte('fecha', startDate)
+      .lte('fecha', endDate);
+
+    if (movimientos) {
+      const small = detectSmallExpenses(movimientos);
+      setSmallExpenses({ total: small.total, count: small.count });
+
+      const top3 = movimientos
+        .filter(m => m.tipo === 'EGRESO')
+        .sort((a, b) => Number(b.monto) - Number(a.monto))
+        .slice(0, 3);
+      setTop3Expenses(top3);
+
+      const totalGastado = movimientos
+        .filter(m => m.tipo === 'EGRESO')
+        .reduce((sum, m) => sum + Number(m.monto), 0);
+
+      const diasTranscurridos = getDaysElapsedInMonth();
+      const diasEnMes = getDaysInMonth();
+      const projected = calculateProjectedSpending(totalGastado, diasTranscurridos, diasEnMes);
+      setProjectedSpending(projected);
+    }
+  }
+
   async function verificarDatosMultiplesMeses() {
     const { data } = await supabase
       .from('movimientos')
@@ -424,7 +495,13 @@ export default function Dashboard() {
 
 
   if (loading) {
-    return <div className="loading">Cargando...</div>;
+    return (
+      <div className="dashboard">
+        <SkeletonStats />
+        <SkeletonCard />
+        <SkeletonCard />
+      </div>
+    );
   }
 
   const nombreMesRaw = new Date(anioFiltro, mesFiltro - 1).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
@@ -432,6 +509,15 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
+      {offlineMode && (
+        <div className="alert-banner alert-warning">
+          <div className="alert-icon">📡</div>
+          <div className="alert-text">
+            Mostrando datos guardados - sin conexión
+          </div>
+        </div>
+      )}
+
       {!presupuestoMensual && (
         <div className="alert-banner config-banner" onClick={() => navigate('/config', { state: { fromBanner: true } })}>
           <div className="alert-icon">⚙️</div>
@@ -593,6 +679,81 @@ export default function Dashboard() {
 
           {presupuestoMensual && (
             <InteligenciaFinanciera presupuestoMensual={presupuestoMensual} />
+          )}
+
+          {savingsStreak > 0 && (
+            <div className="insight-card savings-streak">
+              <div className="insight-icon">🔥</div>
+              <div className="insight-content">
+                <div className="insight-title">Racha de ahorro</div>
+                <div className="insight-text">
+                  {savingsStreak} {savingsStreak === 1 ? 'mes' : 'meses'} consecutivo{savingsStreak > 1 ? 's' : ''} bajo presupuesto
+                </div>
+              </div>
+            </div>
+          )}
+
+          {smallExpenses.count > 0 && (
+            <div className="insight-card small-expenses">
+              <div className="insight-icon">🐜</div>
+              <div className="insight-content">
+                <div className="insight-title">Gasto hormiga detectado</div>
+                <div className="insight-text">
+                  Gastaron {formatCurrency(smallExpenses.total)} en gastos menores a $5.000 este mes ({smallExpenses.count} movimientos)
+                </div>
+              </div>
+            </div>
+          )}
+
+          {getDaysRemainingInMonth() > 0 && projectedSpending > 0 && (
+            <div className="insight-card projected">
+              <div className="insight-icon">📊</div>
+              <div className="insight-content">
+                <div className="insight-title">
+                  Días restantes del mes: {getDaysRemainingInMonth()}
+                </div>
+                <div className="insight-text">
+                  Si seguís así, cerrarás el mes en {formatCurrency(projectedSpending)}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {resumenMes.variacionMesAnterior !== 0 && (
+            <div className={`insight-card comparison ${resumenMes.variacionMesAnterior > 0 ? 'negative' : 'positive'}`}>
+              <div className="insight-icon">
+                {resumenMes.variacionMesAnterior > 0 ? '↑' : '↓'}
+              </div>
+              <div className="insight-content">
+                <div className="insight-title">Comparación con mes anterior</div>
+                <div className="insight-text">
+                  Gastaron {Math.abs(resumenMes.variacionMesAnterior).toFixed(1)}% {resumenMes.variacionMesAnterior > 0 ? 'más' : 'menos'} que el mes pasado
+                </div>
+              </div>
+            </div>
+          )}
+
+          {top3Expenses.length > 0 && (
+            <div className="insight-card top-expenses">
+              <div className="insight-header">
+                <div className="insight-icon">👑</div>
+                <div className="insight-title">Top 3 gastos del mes</div>
+              </div>
+              <div className="top-expenses-list">
+                {top3Expenses.map((expense, index) => (
+                  <div key={expense.id} className="top-expense-item">
+                    <div className="expense-rank">{index + 1}</div>
+                    <div className="expense-info">
+                      <div className="expense-description">{expense.descripcion}</div>
+                      {expense.categoria && (
+                        <span className="expense-category">{expense.categoria}</span>
+                      )}
+                    </div>
+                    <div className="expense-amount">{formatCurrency(expense.monto)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           <div className="section">
