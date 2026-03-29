@@ -2,12 +2,17 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Usuario } from '../types';
 import { supabase } from '../lib/supabase';
 import { formatCurrency } from '../lib/currency';
+import { autoGenerateMonthlyFixedExpenses } from '../lib/autoGenerateFixedExpenses';
+import { subscribeToMovimientos, unsubscribeFromMovimientos } from '../lib/realtimeNotifications';
+import { closeMonthAndGenerateHistory } from '../lib/monthlyClosing';
 
 interface AppContextType {
   currentUser: Usuario | null;
   setCurrentUser: (user: Usuario | null) => void;
   users: Usuario[];
   logout: () => void;
+  generatedExpensesBanner: string | null;
+  dismissBanner: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -18,11 +23,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return saved ? JSON.parse(saved) : null;
   });
   const [users, setUsers] = useState<Usuario[]>([]);
+  const [generatedExpensesBanner, setGeneratedExpensesBanner] = useState<string | null>(null);
 
   useEffect(() => {
     loadUsers();
     solicitarPermisoNotificaciones();
   }, []);
+
+  useEffect(() => {
+    if (currentUser?.familia_id) {
+      checkAndGenerateMonthlyExpenses();
+      checkAndCloseMonth();
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (currentUser) {
+      subscribeToMovimientos(currentUser.id, currentUser.familia_id || null);
+    } else {
+      unsubscribeFromMovimientos();
+    }
+
+    return () => {
+      unsubscribeFromMovimientos();
+    };
+  }, [currentUser]);
 
   useEffect(() => {
     if (currentUser) {
@@ -41,6 +66,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (data) {
       setUsers(data);
     }
+  }
+
+  async function checkAndGenerateMonthlyExpenses() {
+    if (!currentUser?.familia_id) return;
+
+    const now = new Date();
+    const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+    const lastCheck = localStorage.getItem('lastExpenseGeneration');
+
+    if (lastCheck === monthKey) {
+      return;
+    }
+
+    const count = await autoGenerateMonthlyFixedExpenses(currentUser.familia_id);
+
+    if (count > 0) {
+      setGeneratedExpensesBanner(`¡Nuevo mes! Se generaron ${count} gastos fijos pendientes`);
+      localStorage.setItem('lastExpenseGeneration', monthKey);
+    }
+  }
+
+  async function checkAndCloseMonth() {
+    if (!currentUser?.familia_id) return;
+
+    const now = new Date();
+    const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+    const lastClosure = localStorage.getItem('lastMonthClosure');
+
+    if (lastClosure === monthKey) {
+      return;
+    }
+
+    const closed = await closeMonthAndGenerateHistory(currentUser.familia_id);
+
+    if (closed) {
+      localStorage.setItem('lastMonthClosure', monthKey);
+    }
+  }
+
+  function dismissBanner() {
+    setGeneratedExpensesBanner(null);
   }
 
   function logout() {
@@ -89,10 +155,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    if (!currentUser?.familia_id) return;
+
     const { data } = await supabase
       .from('gastos_fijos_plantilla')
       .select('*')
-      .eq('activo', true);
+      .eq('activo', true)
+      .eq('familia_id', currentUser.familia_id);
 
     if (data) {
       const gastosProximos = data
@@ -122,7 +191,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AppContext.Provider value={{ currentUser, setCurrentUser, users, logout }}>
+    <AppContext.Provider value={{ currentUser, setCurrentUser, users, logout, generatedExpensesBanner, dismissBanner }}>
       {children}
     </AppContext.Provider>
   );

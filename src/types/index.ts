@@ -2,6 +2,7 @@ export interface Usuario {
   id: string;
   nombre: string;
   foto_url?: string | null;
+  familia_id?: string | null;
   created_at: string;
 }
 
@@ -12,6 +13,7 @@ export interface GastoFijoPlantilla {
   dia_pago: string;
   dia_vencimiento: number | null;
   activo: boolean;
+  familia_id?: string | null;
   created_at: string;
   updated_at?: string;
   diasRestantes?: number;
@@ -40,6 +42,7 @@ export interface GastoFijoMes {
   fecha_pago: string | null;
   medio_pago: string | null;
   registrado_por: string | null;
+  familia_id?: string | null;
   created_at: string;
   updated_at: string;
   plantilla?: GastoFijoPlantilla;
@@ -59,6 +62,7 @@ export interface Movimiento {
   nota: string | null;
   comprobante_url: string | null;
   registrado_por: string | null;
+  familia_id?: string | null;
   created_at: string;
   usuario?: Usuario;
 }
@@ -67,6 +71,22 @@ export interface Configuracion {
   id: string;
   clave: string;
   valor: string | null;
+  familia_id?: string | null;
+  updated_at: string;
+}
+
+export interface HistorialMes {
+  id: string;
+  familia_id: string;
+  mes: number;
+  anio: number;
+  total_gastado: number;
+  total_ingresado: number;
+  saldo_caja_cierre: number;
+  fijos_pagados: number;
+  fijos_pendientes: number;
+  presupuesto_asignado: number | null;
+  created_at: string;
   updated_at: string;
 }
 

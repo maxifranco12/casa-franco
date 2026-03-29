@@ -6,6 +6,7 @@ import { GastoFijoMes, Movimiento, GastoFijoPlantilla } from '../types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import InteligenciaFinanciera from '../components/InteligenciaFinanciera';
 import VistaAnual from '../components/VistaAnual';
+import MesesAnteriores from '../components/MesesAnteriores';
 import './Dashboard.css';
 
 interface GastoPorCategoria {
@@ -713,6 +714,8 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+
+          <MesesAnteriores />
         </>
       )}
     </div>
