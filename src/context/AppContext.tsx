@@ -13,6 +13,8 @@ interface AppContextType {
   logout: () => void;
   generatedExpensesBanner: string | null;
   dismissBanner: () => void;
+  unreadCount: number;
+  resetUnreadCount: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -24,6 +26,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   });
   const [users, setUsers] = useState<Usuario[]>([]);
   const [generatedExpensesBanner, setGeneratedExpensesBanner] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
   useEffect(() => {
     loadUsers();
@@ -39,7 +42,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (currentUser) {
-      subscribeToMovimientos(currentUser.id, currentUser.familia_id || null);
+      subscribeToMovimientos(currentUser.id, currentUser.familia_id || null, () => {
+        setUnreadCount(prev => prev + 1);
+      });
     } else {
       unsubscribeFromMovimientos();
     }
@@ -112,6 +117,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   function dismissBanner() {
     setGeneratedExpensesBanner(null);
+  }
+
+  function resetUnreadCount() {
+    setUnreadCount(0);
   }
 
   function logout() {
@@ -196,7 +205,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AppContext.Provider value={{ currentUser, setCurrentUser, users, logout, generatedExpensesBanner, dismissBanner }}>
+    <AppContext.Provider value={{ currentUser, setCurrentUser, users, logout, generatedExpensesBanner, dismissBanner, unreadCount, resetUnreadCount }}>
       {children}
     </AppContext.Provider>
   );

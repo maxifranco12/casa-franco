@@ -21,7 +21,11 @@ export async function requestNotificationPermission(): Promise<boolean> {
   return false;
 }
 
-export function subscribeToMovimientos(currentUserId: string | null, familiaId: string | null) {
+export function subscribeToMovimientos(
+  currentUserId: string | null,
+  familiaId: string | null,
+  onNewMovement?: () => void
+) {
   if (realtimeChannel) {
     return;
   }
@@ -44,6 +48,10 @@ export function subscribeToMovimientos(currentUserId: string | null, familiaId: 
 
         if (familiaId && newMovimiento.familia_id !== familiaId) {
           return;
+        }
+
+        if (onNewMovement) {
+          onNewMovement();
         }
 
         const { data: usuario } = await supabase

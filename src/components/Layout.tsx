@@ -9,7 +9,7 @@ import './Layout.css';
 
 export default function Layout() {
   const location = useLocation();
-  const { currentUser, logout } = useApp();
+  const { currentUser, logout, generatedExpensesBanner, dismissBanner, unreadCount, resetUnreadCount } = useApp();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [procesandoImagen, setProcesandoImagen] = useState(false);
   const [datosConfirmacion, setDatosConfirmacion] = useState<any>(null);
@@ -64,14 +64,21 @@ export default function Layout() {
           <Link to="/" className="header-title">Casa Franco</Link>
           {currentUser && (
             <div className="header-user">
-              <Link to="/config" className="user-avatar-link">
-                {currentUser.foto_url ? (
-                  <img src={currentUser.foto_url} alt={currentUser.nombre} className="user-avatar-img" />
-                ) : (
-                  <div className="user-avatar-placeholder">
-                    {currentUser.nombre.charAt(0)}
-                  </div>
-                )}
+              <Link to="/config" className="user-avatar-link" onClick={resetUnreadCount}>
+                <div className="user-avatar-wrapper">
+                  {currentUser.foto_url ? (
+                    <img src={currentUser.foto_url} alt={currentUser.nombre} className="user-avatar-img" />
+                  ) : (
+                    <div className="user-avatar-placeholder">
+                      {currentUser.nombre.charAt(0)}
+                    </div>
+                  )}
+                  {unreadCount > 0 && (
+                    <div className="avatar-badge">
+                      {unreadCount}
+                    </div>
+                  )}
+                </div>
               </Link>
               <button onClick={logout} className="logout-btn">
                 Salir
@@ -80,6 +87,24 @@ export default function Layout() {
           )}
         </div>
       </header>
+
+      {generatedExpensesBanner && (
+        <div className="expenses-banner">
+          <div className="expenses-banner-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <span>{generatedExpensesBanner}</span>
+          </div>
+          <button onClick={dismissBanner} className="banner-close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      )}
 
       <main className="app-main">
         <Outlet />

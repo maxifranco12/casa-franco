@@ -51,6 +51,12 @@
   text-decoration: none;
 }
 
+.user-avatar-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .user-avatar-img {
   width: 36px;
   height: 36px;
@@ -83,6 +89,25 @@
   transform: scale(1.05);
 }
 
+.avatar-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #E53E3E;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 0 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 .logout-btn {
   background: transparent;
   color: var(--text-secondary);
@@ -96,6 +121,58 @@
 .logout-btn:hover {
   background: var(--background);
   color: var(--text);
+}
+
+.expenses-banner {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.08) 100%);
+  border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.expenses-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgb(22, 163, 74);
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.expenses-banner-content svg {
+  flex-shrink: 0;
+}
+
+.banner-close {
+  background: transparent;
+  color: rgb(22, 163, 74);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.banner-close:hover {
+  background: rgba(34, 197, 94, 0.15);
 }
 
 .app-main {
