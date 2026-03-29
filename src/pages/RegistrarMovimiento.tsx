@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useApp } from '../context/AppContext';
 import { MEDIOS_PAGO, CATEGORIAS_GASTOS, GastoFijoPlantilla } from '../types';
 import { formatMontoInput, parseMontoInput } from '../lib/formatMonto';
+import { showToast } from '../lib/toast';
 import './RegistrarMovimiento.css';
 
 interface PrecompletadoData {
@@ -32,6 +33,8 @@ export default function RegistrarMovimiento() {
   });
   const [guardando, setGuardando] = useState(false);
   const [gastosFijos, setGastosFijos] = useState<GastoFijoPlantilla[]>([]);
+  const [showFutureDateWarning, setShowFutureDateWarning] = useState(false);
+  const [montoError, setMontoError] = useState('');
   const esEscaneo = !!precompletado;
 
   useEffect(() => {
@@ -52,6 +55,31 @@ export default function RegistrarMovimiento() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!currentUser) return;
+
+    const monto = parseMontoInput(formData.monto);
+    if (monto <= 0) {
+      setMontoError('El monto debe ser mayor a $0');
+      const montoInput = document.querySelector('input[type="text"][inputMode="numeric"]');
+      montoInput?.classList.add('input-error');
+      setTimeout(() => montoInput?.classList.remove('input-error'), 300);
+      return;
+    }
+    setMontoError('');
+
+    const fechaSeleccionada = new Date(formData.fecha);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    if (fechaSeleccionada > hoy && !showFutureDateWarning) {
+      setShowFutureDateWarning(true);
+      return;
+    }
+
+    await guardarMovimiento();
+  }
+
+  async function guardarMovimiento() {
     if (!currentUser) return;
 
     setGuardando(true);
@@ -75,7 +103,7 @@ export default function RegistrarMovimiento() {
 
     if (movimientoError) {
       setGuardando(false);
-      alert('Error al guardar el movimiento');
+      showToast('Error al guardar el movimiento', 'error');
       return;
     }
 
@@ -98,7 +126,8 @@ export default function RegistrarMovimiento() {
     }
 
     setGuardando(false);
-    navigate('/caja');
+    showToast('✓ Guardado', 'success');
+    setTimeout(() => navigate('/caja'), 500);
   }
 
   function updateForm(field: string, value: any) {
@@ -126,6 +155,33 @@ export default function RegistrarMovimiento() {
           <div>
             <div className="escaneo-title">Comprobante escaneado</div>
             <div className="escaneo-subtitle">Revisa y ajusta los datos antes de guardar</div>
+          </div>
+        </div>
+      )}
+
+      {showFutureDateWarning && (
+        <div className="future-date-warning">
+          <div className="future-date-warning-title">
+            ⚠️ Estás cargando una fecha futura, ¿confirmás?
+          </div>
+          <div className="future-date-buttons">
+            <button
+              type="button"
+              className="btn-confirm-future"
+              onClick={() => {
+                setShowFutureDateWarning(false);
+                guardarMovimiento();
+              }}
+            >
+              Confirmar
+            </button>
+            <button
+              type="button"
+              className="btn-cancel-future"
+              onClick={() => setShowFutureDateWarning(false)}
+            >
+              Cancelar
+            </button>
           </div>
         </div>
       )}
@@ -165,10 +221,14 @@ export default function RegistrarMovimiento() {
             type="text"
             inputMode="numeric"
             value={formData.monto}
-            onChange={e => updateForm('monto', formatMontoInput(e.target.value))}
+            onChange={e => {
+              updateForm('monto', formatMontoInput(e.target.value));
+              setMontoError('');
+            }}
             placeholder="$0"
             required
           />
+          {montoError && <span style={{color: 'var(--danger)', fontSize: '13px', marginTop: '4px'}}>{montoError}</span>}
         </div>
 
         <div className="form-group">

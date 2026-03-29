@@ -27,6 +27,7 @@ export interface HistorialPagoGastoFijo {
   medio_pago: string;
   mes: number;
   anio: number;
+  nota?: string | null;
   registrado_por: string | null;
   created_at: string;
   usuario?: Usuario;

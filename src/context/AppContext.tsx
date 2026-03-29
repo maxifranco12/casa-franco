@@ -5,6 +5,7 @@ import { formatCurrency } from '../lib/currency';
 import { autoGenerateMonthlyFixedExpenses } from '../lib/autoGenerateFixedExpenses';
 import { subscribeToMovimientos, unsubscribeFromMovimientos } from '../lib/realtimeNotifications';
 import { closeMonthAndGenerateHistory } from '../lib/monthlyClosing';
+import { checkSessionTimeout, updateLastActivity } from '../lib/sessionCheck';
 
 interface AppContextType {
   currentUser: Usuario | null;
@@ -31,6 +32,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     loadUsers();
     solicitarPermisoNotificaciones();
+
+    if (checkSessionTimeout()) {
+      logout();
+    } else {
+      updateLastActivity();
+    }
   }, []);
 
   useEffect(() => {

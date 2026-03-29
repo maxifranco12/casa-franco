@@ -5,6 +5,7 @@ import { formatCurrency } from '../lib/currency';
 import { Movimiento, MEDIOS_PAGO, CATEGORIAS_GASTOS } from '../types';
 import { formatMontoInput, parseMontoInput } from '../lib/formatMonto';
 import { useApp } from '../context/AppContext';
+import { showToast } from '../lib/toast';
 import './Caja.css';
 
 export default function Caja() {
@@ -20,9 +21,14 @@ export default function Caja() {
   const [filtroMes, setFiltroMes] = useState('actual');
   const [editando, setEditando] = useState<string | null>(null);
   const [formEdit, setFormEdit] = useState<any>({});
+  const [guardandoEdit, setGuardandoEdit] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [mostrarHistorialSaldos, setMostrarHistorialSaldos] = useState(false);
+  const [historialSaldos, setHistorialSaldos] = useState<any[]>([]);
 
   useEffect(() => {
     cargarDatos();
+    cargarHistorialSaldos();
   }, [filtroMes]);
 
   async function cargarDatos() {
@@ -32,6 +38,26 @@ export default function Caja() {
       calcularEstadisticas()
     ]);
     setLoading(false);
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await cargarDatos();
+    await cargarHistorialSaldos();
+    setRefreshing(false);
+  }
+
+  async function cargarHistorialSaldos() {
+    const { data } = await supabase
+      .from('historial_meses')
+      .select('*')
+      .order('anio', { ascending: false })
+      .order('mes', { ascending: false })
+      .limit(12);
+
+    if (data) {
+      setHistorialSaldos(data);
+    }
   }
 
   async function cargarMovimientos() {
@@ -133,11 +159,19 @@ export default function Caja() {
   }
 
   async function guardarEdicion(id: string) {
+    const monto = parseMontoInput(formEdit.monto);
+    if (monto <= 0) {
+      showToast('El monto debe ser mayor a $0', 'error');
+      return;
+    }
+
+    setGuardandoEdit(true);
+
     const { error } = await supabase
       .from('movimientos')
       .update({
         descripcion: formEdit.descripcion,
-        monto: parseMontoInput(formEdit.monto),
+        monto,
         fecha: formEdit.fecha,
         categoria: formEdit.categoria,
         medio_pago: formEdit.medio_pago,
@@ -146,12 +180,15 @@ export default function Caja() {
       })
       .eq('id', id);
 
+    setGuardandoEdit(false);
+
     if (!error) {
+      showToast('✓ Guardado', 'success');
       setEditando(null);
       setFormEdit({});
       cargarDatos();
     } else {
-      alert('Error al actualizar el movimiento');
+      showToast('Error al actualizar el movimiento', 'error');
     }
   }
 
@@ -168,9 +205,48 @@ export default function Caja() {
           </svg>
           Volver
         </button>
-        <h1>Caja de la Casa</h1>
-        <p>Gestionada por Carolina Daniel</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1>Caja de la Casa</h1>
+            <p>Gestionada por Carolina Daniel</p>
+          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '10px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={refreshing ? 'spinning' : ''}
+            >
+              <polyline points="23 4 23 10 17 10"/>
+              <polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {estadisticas.saldoEfectivo < 0 && (
+        <div className="alert-banner alert-danger" style={{ margin: '0 16px 16px' }}>
+          ⚠️ Saldo en efectivo negativo: {formatCurrency(estadisticas.saldoEfectivo)}
+        </div>
+      )}
 
       <div className="caja-saldo-hero">
         <div className="saldo-icon">💵</div>
@@ -178,7 +254,40 @@ export default function Caja() {
           <div className="saldo-label">Efectivo disponible</div>
           <div className="saldo-valor">{formatCurrency(estadisticas.saldoEfectivo)}</div>
         </div>
+        <button
+          onClick={() => setMostrarHistorialSaldos(!mostrarHistorialSaldos)}
+          style={{
+            marginTop: '12px',
+            padding: '8px 16px',
+            background: 'rgba(45, 55, 72, 0.1)',
+            color: 'var(--text)',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+            fontSize: '13px',
+            cursor: 'pointer'
+          }}
+        >
+          {mostrarHistorialSaldos ? 'Ocultar' : 'Ver'} historial de saldos
+        </button>
       </div>
+
+      {mostrarHistorialSaldos && historialSaldos.length > 0 && (
+        <div style={{ margin: '0 16px 24px', background: 'var(--surface)', padding: '16px', borderRadius: '12px', boxShadow: '0 2px 8px var(--shadow)' }}>
+          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Historial de cierres mensuales</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {historialSaldos.map(mes => (
+              <div key={mes.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', background: 'var(--background)', borderRadius: '6px' }}>
+                <span style={{ fontSize: '14px' }}>
+                  {new Date(mes.anio, mes.mes - 1).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
+                </span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: mes.saldo_caja_cierre >= 0 ? 'var(--secondary)' : 'var(--danger)' }}>
+                  {formatCurrency(mes.saldo_caja_cierre)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="caja-stats">
         <div className="caja-stat ingreso">
@@ -298,12 +407,14 @@ export default function Caja() {
                               <button
                                 className="btn-save"
                                 onClick={() => guardarEdicion(mov.id)}
+                                disabled={guardandoEdit}
                               >
-                                Guardar cambios
+                                {guardandoEdit ? 'Guardando...' : 'Guardar cambios'}
                               </button>
                               <button
                                 className="btn-cancel"
                                 onClick={cancelarEdicion}
+                                disabled={guardandoEdit}
                               >
                                 Cancelar
                               </button>

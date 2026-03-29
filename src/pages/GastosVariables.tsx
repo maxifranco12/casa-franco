@@ -5,6 +5,7 @@ import { formatCurrency } from '../lib/currency';
 import { Movimiento, CATEGORIAS_GASTOS, MEDIOS_PAGO } from '../types';
 import { formatMontoInput, parseMontoInput } from '../lib/formatMonto';
 import { useApp } from '../context/AppContext';
+import { showToast } from '../lib/toast';
 import './GastosVariables.css';
 
 export default function GastosVariables() {
@@ -16,6 +17,8 @@ export default function GastosVariables() {
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState<string | null>(null);
   const [formEdit, setFormEdit] = useState<any>({});
+  const [guardandoEdit, setGuardandoEdit] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     cargarGastos();
@@ -44,6 +47,12 @@ export default function GastosVariables() {
     }
 
     setLoading(false);
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await cargarGastos();
+    setRefreshing(false);
   }
 
   function calcularTotales(gastos: Movimiento[]) {
@@ -76,11 +85,19 @@ export default function GastosVariables() {
   }
 
   async function guardarEdicion(id: string) {
+    const monto = parseMontoInput(formEdit.monto);
+    if (monto <= 0) {
+      showToast('El monto debe ser mayor a $0', 'error');
+      return;
+    }
+
+    setGuardandoEdit(true);
+
     const { error } = await supabase
       .from('movimientos')
       .update({
         descripcion: formEdit.descripcion,
-        monto: parseMontoInput(formEdit.monto),
+        monto,
         fecha: formEdit.fecha,
         categoria: formEdit.categoria,
         medio_pago: formEdit.medio_pago,
@@ -89,12 +106,15 @@ export default function GastosVariables() {
       })
       .eq('id', id);
 
+    setGuardandoEdit(false);
+
     if (!error) {
+      showToast('✓ Guardado', 'success');
       setEditando(null);
       setFormEdit({});
       cargarGastos();
     } else {
-      alert('Error al actualizar el gasto');
+      showToast('Error al actualizar el gasto', 'error');
     }
   }
 
@@ -134,8 +154,41 @@ export default function GastosVariables() {
           </svg>
           Volver
         </button>
-        <h1>Gastos variables</h1>
-        <p style={{ textTransform: 'capitalize' }}>{new Date().toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div>
+            <h1>Gastos variables</h1>
+            <p style={{ textTransform: 'capitalize' }}>{new Date().toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}</p>
+          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            style={{
+              background: 'var(--surface)',
+              color: 'var(--text)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '10px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={refreshing ? 'spinning' : ''}
+            >
+              <polyline points="23 4 23 10 17 10"/>
+              <polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="gastos-total-card">
@@ -254,12 +307,14 @@ export default function GastosVariables() {
                       <button
                         className="btn-save"
                         onClick={() => guardarEdicion(gasto.id)}
+                        disabled={guardandoEdit}
                       >
-                        Guardar cambios
+                        {guardandoEdit ? 'Guardando...' : 'Guardar cambios'}
                       </button>
                       <button
                         className="btn-cancel"
                         onClick={cancelarEdicion}
+                        disabled={guardandoEdit}
                       >
                         Cancelar
                       </button>
