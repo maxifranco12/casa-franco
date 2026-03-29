@@ -642,7 +642,10 @@ export default function Dashboard() {
                 </div>
                 {presupuestoMensual && (
                   <div className="hero-stat secondary">
-                    <div className="hero-stat-label">Disponible del presupuesto</div>
+                    <div className="hero-stat-label">Resto del presupuesto</div>
+                    <div className="hero-stat-note" onClick={() => navigate('/caja')} style={{ cursor: 'pointer', color: 'var(--primary)', fontSize: '11px', marginBottom: '4px', textDecoration: 'underline' }}>
+                      La plata real está en Caja →
+                    </div>
                     <div className={`hero-stat-value ${presupuestoMensual - estadisticas.totalGastado >= 0 ? 'positivo' : 'negativo'}`}>
                       {formatCurrency(Math.abs(presupuestoMensual - estadisticas.totalGastado))}
                     </div>
@@ -780,7 +783,7 @@ export default function Dashboard() {
                     </span>
                   ) : (
                     <span>
-                      Disponible: {formatCurrency(presupuestoMensual - estadisticas.totalGastado)} de {formatCurrency(presupuestoMensual)}
+                      Resto del presupuesto: {formatCurrency(presupuestoMensual - estadisticas.totalGastado)} de {formatCurrency(presupuestoMensual)}
                     </span>
                   )}
                 </div>

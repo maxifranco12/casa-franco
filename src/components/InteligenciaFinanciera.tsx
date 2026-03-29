@@ -231,14 +231,15 @@ Sé específico con números reales y directo.`;
             </div>
           </div>
 
-          <div className="stats-row">
-            <div className="stat-item">
-              <span className="stat-label">Gastado</span>
-              <span className="stat-value" ref={gastadoRef}>$0</span>
+          <div className="stats-row-new">
+            <div className="stat-item-primary">
+              <span className="stat-label-primary">Gastado</span>
+              <span className="stat-value-primary" ref={gastadoRef}>$0</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-label">Disponible</span>
-              <span className="stat-value disponible" ref={disponibleRef}>$0</span>
+            <div className="stat-item-secondary">
+              <span className="stat-label-secondary">Resto del presupuesto ideal</span>
+              <span className="stat-sublabel">(no es la plata real en caja)</span>
+              <span className="stat-value-secondary" ref={disponibleRef}>$0</span>
             </div>
           </div>
         </div>

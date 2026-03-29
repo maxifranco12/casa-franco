@@ -43,16 +43,19 @@
 }
 
 .saldo-label {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-  font-weight: 500;
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .saldo-valor {
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--text);
+  font-size: 48px;
+  font-weight: 900;
+  color: #4CAF50;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .caja-stats {
