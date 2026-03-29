@@ -148,6 +148,9 @@ Sé específico con números reales y directo.`;
 
     try {
       const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-ia`;
+      console.log('Calling URL:', apiUrl);
+      console.log('Anon key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+
       const headers = {
         'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json',
@@ -156,11 +159,16 @@ Sé específico con números reales y directo.`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ mensaje: prompt })
+        body: JSON.stringify({
+          systemPrompt: "Sos un asesor financiero familiar argentino. Respondé en español rioplatense, máximo 3 líneas, concreto y motivador.",
+          messages: [{ role: "user", content: prompt }]
+        })
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
-      const consejo = data.respuesta || 'No se pudo obtener un consejo en este momento.';
+      console.log('Response data:', data);
+      const consejo = data.content?.[0]?.text || 'No se pudo obtener un consejo en este momento.';
 
       setConsejoIA(consejo);
       localStorage.setItem(cacheKey, consejo);
