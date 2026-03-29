@@ -82,7 +82,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const count = await autoGenerateMonthlyFixedExpenses(currentUser.familia_id);
 
     if (count > 0) {
-      setGeneratedExpensesBanner(`¡Nuevo mes! Se generaron ${count} gastos fijos pendientes`);
+      const isDayOne = now.getDate() === 1;
+
+      if (isDayOne) {
+        setGeneratedExpensesBanner(`¡Nuevo mes! Se generaron ${count} gastos fijos pendientes`);
+      }
+
       localStorage.setItem('lastExpenseGeneration', monthKey);
     }
   }
