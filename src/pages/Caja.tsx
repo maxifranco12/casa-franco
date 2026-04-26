@@ -7,6 +7,7 @@ import { formatMontoInput, parseMontoInput } from '../lib/formatMonto';
 import { useApp } from '../context/AppContext';
 import { showToast } from '../lib/toast';
 import { groupByWeek, calculateSpendingByPerson } from '../lib/insights';
+import { calcularTotalGastadoMes } from '../lib/calculos';
 import './Caja.css';
 
 export default function Caja() {
@@ -102,7 +103,6 @@ export default function Caja() {
 
     let saldoEfectivo = 0;
     let ingresosMes = 0;
-    let egresosMes = 0;
 
     const inicioMes = new Date();
     inicioMes.setDate(1);
@@ -121,15 +121,15 @@ export default function Caja() {
             saldoEfectivo += monto;
           }
         } else {
-          if (esDeMesActual) {
-            egresosMes += monto;
-          }
           if (m.medio_pago === 'Efectivo') {
             saldoEfectivo -= monto;
           }
         }
       });
     }
+
+    const now = new Date();
+    const egresosMes = await calcularTotalGastadoMes(now.getMonth() + 1, now.getFullYear());
 
     setEstadisticas({ saldoEfectivo, ingresosMes, egresosMes });
   }
