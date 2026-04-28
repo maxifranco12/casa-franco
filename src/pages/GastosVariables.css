@@ -24,100 +24,31 @@
 }
 
 .categorias-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
   padding: 0 24px;
   margin-bottom: 32px;
 }
 
-.categoria-card-expandable {
+.categoria-card {
   background: var(--surface);
+  padding: 16px;
   border-radius: 12px;
   box-shadow: 0 2px 8px var(--shadow);
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-
-.categoria-card-expandable.expanded {
-  box-shadow: 0 4px 12px var(--shadow);
-}
-
-.categoria-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.categoria-card-header:hover {
-  background: rgba(0, 0, 0, 0.02);
+  text-align: center;
 }
 
 .categoria-nombre {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.categoria-total-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
 }
 
 .categoria-total {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--primary);
-}
-
-.chevron {
-  transition: transform 0.2s ease;
-  color: var(--text-secondary);
-}
-
-.chevron.rotated {
-  transform: rotate(180deg);
-}
-
-.categoria-movimientos {
-  border-top: 1px solid var(--border);
-  padding: 8px 0;
-}
-
-.categoria-movimiento-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-}
-
-.categoria-movimiento-item:last-child {
-  border-bottom: none;
-}
-
-.categoria-mov-top {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.categoria-mov-desc {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.categoria-mov-monto {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--danger);
-  text-align: right;
 }
 
 .registrar-gasto-btn {
@@ -349,6 +280,10 @@
 }
 
 @media (min-width: 768px) {
+  .categorias-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   .total-valor {
     font-size: 56px;
   }

@@ -10,7 +10,6 @@ import MesesAnteriores from '../components/MesesAnteriores';
 import { SkeletonCard, SkeletonStats } from '../components/SkeletonLoader';
 import { calculateSavingsStreak, detectSmallExpenses, calculateProjectedSpending, getDaysElapsedInMonth, getDaysInMonth, getDaysRemainingInMonth } from '../lib/insights';
 import { saveToCache, getFromCache } from '../lib/cache';
-import { calcularTotalGastadoMes } from '../lib/calculos';
 import './Dashboard.css';
 
 interface GastoPorCategoria {
@@ -30,7 +29,8 @@ export default function Dashboard() {
   const [estadisticas, setEstadisticas] = useState({
     totalGastado: 0,
     fijosPagados: 0,
-    fijosPendientes: 0
+    fijosPendientes: 0,
+    saldoCaja: 0
   });
   const [fotoInicio, setFotoInicio] = useState('/image0.jpeg');
   const [loading, setLoading] = useState(true);
@@ -196,6 +196,22 @@ export default function Dashboard() {
       .eq('mes', mesFiltro)
       .eq('anio', anioFiltro);
 
+    const startDate = new Date(anioFiltro, mesFiltro - 1, 1).toISOString().split('T')[0];
+    const endDate = new Date(anioFiltro, mesFiltro, 0).toISOString().split('T')[0];
+
+    const { data: historialPagosFijos } = await supabase
+      .from('historial_pagos_gastos_fijos')
+      .select('monto')
+      .gte('fecha_pago', startDate)
+      .lte('fecha_pago', endDate);
+
+    const { data: movimientos } = await supabase
+      .from('movimientos')
+      .select('tipo, monto, medio_pago')
+      .gte('fecha', startDate)
+      .lte('fecha', endDate);
+
+    let totalGastado = 0;
     let fijosPagados = 0;
     let fijosPendientes = 0;
 
@@ -209,12 +225,35 @@ export default function Dashboard() {
       });
     }
 
-    const totalGastado = await calcularTotalGastadoMes(mesFiltro, anioFiltro);
+    if (historialPagosFijos) {
+      historialPagosFijos.forEach(p => {
+        totalGastado += Number(p.monto);
+      });
+    }
+
+    let saldoCaja = 0;
+    if (movimientos) {
+      movimientos.forEach(m => {
+        const esEfectivo = m.medio_pago === 'Efectivo';
+
+        if (m.tipo === 'INGRESO') {
+          if (esEfectivo) {
+            saldoCaja += Number(m.monto);
+          }
+        } else {
+          totalGastado += Number(m.monto);
+          if (esEfectivo) {
+            saldoCaja -= Number(m.monto);
+          }
+        }
+      });
+    }
 
     setEstadisticas({
       totalGastado,
       fijosPagados,
-      fijosPendientes
+      fijosPendientes,
+      saldoCaja
     });
   }
 
@@ -604,6 +643,9 @@ export default function Dashboard() {
                 {presupuestoMensual && (
                   <div className="hero-stat secondary">
                     <div className="hero-stat-label">Resto del presupuesto</div>
+                    <div className="hero-stat-note" onClick={() => navigate('/caja')} style={{ cursor: 'pointer', color: 'var(--primary)', fontSize: '11px', marginBottom: '4px', textDecoration: 'underline' }}>
+                      La plata real está en Caja →
+                    </div>
                     <div className={`hero-stat-value ${presupuestoMensual - estadisticas.totalGastado >= 0 ? 'positivo' : 'negativo'}`}>
                       {formatCurrency(Math.abs(presupuestoMensual - estadisticas.totalGastado))}
                     </div>
@@ -621,6 +663,19 @@ export default function Dashboard() {
                   <span className="detail-label">Fijos pagados</span>
                   <span className="detail-value">{estadisticas.fijosPagados}/{estadisticas.fijosPagados + estadisticas.fijosPendientes}</span>
                 </div>
+              </div>
+            </div>
+
+            <div className="hero-card secondary-card">
+              <div className="secondary-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </div>
+              <div className="secondary-info">
+                <div className="secondary-label">Efectivo disponible</div>
+                <div className="secondary-value">{formatCurrency(estadisticas.saldoCaja)}</div>
               </div>
             </div>
           </div>
