@@ -6,6 +6,7 @@ import { Movimiento, CATEGORIAS_GASTOS, MEDIOS_PAGO } from '../types';
 import { formatMontoInput, parseMontoInput } from '../lib/formatMonto';
 import { useApp } from '../context/AppContext';
 import { showToast } from '../lib/toast';
+import { calcularTotalGastadoMes } from '../lib/calculos';
 import './GastosVariables.css';
 
 export default function GastosVariables() {
@@ -14,11 +15,13 @@ export default function GastosVariables() {
   const [gastos, setGastos] = useState<Movimiento[]>([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('TODAS');
   const [totalPorCategoria, setTotalPorCategoria] = useState<Record<string, number>>({});
+  const [totalGastadoMes, setTotalGastadoMes] = useState(0);
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState<string | null>(null);
   const [formEdit, setFormEdit] = useState<any>({});
   const [guardandoEdit, setGuardandoEdit] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [categoriaExpandida, setCategoriaExpandida] = useState<string | null>(null);
 
   useEffect(() => {
     cargarGastos();
@@ -27,9 +30,10 @@ export default function GastosVariables() {
   async function cargarGastos() {
     setLoading(true);
 
-    const inicioMes = new Date();
-    inicioMes.setDate(1);
-    inicioMes.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const mes = now.getMonth() + 1;
+    const anio = now.getFullYear();
+    const inicioMes = new Date(anio, mes - 1, 1).toISOString().split('T')[0];
 
     const { data } = await supabase
       .from('movimientos')
@@ -38,13 +42,16 @@ export default function GastosVariables() {
         usuario:registrado_por(nombre)
       `)
       .eq('tipo', 'EGRESO')
-      .gte('fecha', inicioMes.toISOString().split('T')[0])
+      .gte('fecha', inicioMes)
       .order('fecha', { ascending: false });
 
     if (data) {
       setGastos(data);
       calcularTotales(data);
     }
+
+    const total = await calcularTotalGastadoMes(mes, anio);
+    setTotalGastadoMes(total);
 
     setLoading(false);
   }
@@ -135,11 +142,13 @@ export default function GastosVariables() {
     }
   }
 
+  function toggleCategoria(categoria: string) {
+    setCategoriaExpandida(prev => prev === categoria ? null : categoria);
+  }
+
   const gastosFiltrados = categoriaSeleccionada === 'TODAS'
     ? gastos
     : gastos.filter(g => g.categoria === categoriaSeleccionada);
-
-  const totalGeneral = Object.values(totalPorCategoria).reduce((a, b) => a + b, 0);
 
   if (loading) {
     return <div className="loading">Cargando...</div>;
@@ -193,18 +202,60 @@ export default function GastosVariables() {
 
       <div className="gastos-total-card">
         <div className="total-label">Total gastado este mes</div>
-        <div className="total-valor">{formatCurrency(totalGeneral)}</div>
+        <div className="total-valor">{formatCurrency(totalGastadoMes)}</div>
       </div>
 
       <div className="categorias-grid">
         {Object.entries(totalPorCategoria)
           .sort((a, b) => b[1] - a[1])
-          .map(([categoria, total]) => (
-            <div key={categoria} className="categoria-card">
-              <div className="categoria-nombre">{categoria}</div>
-              <div className="categoria-total">{formatCurrency(total)}</div>
-            </div>
-          ))}
+          .map(([categoria, total]) => {
+            const isExpanded = categoriaExpandida === categoria;
+            const gastosDeCategoria = gastos.filter(g => (g.categoria || 'Sin categoría') === categoria);
+
+            return (
+              <div key={categoria} className={`categoria-card-expandable ${isExpanded ? 'expanded' : ''}`}>
+                <div
+                  className="categoria-card-header"
+                  onClick={() => toggleCategoria(categoria)}
+                >
+                  <div className="categoria-nombre">{categoria}</div>
+                  <div className="categoria-total-row">
+                    <div className="categoria-total">{formatCurrency(total)}</div>
+                    <svg
+                      className={`chevron ${isExpanded ? 'rotated' : ''}`}
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                  </div>
+                </div>
+
+                {isExpanded && (
+                  <div className="categoria-movimientos">
+                    {gastosDeCategoria.map(gasto => (
+                      <div key={gasto.id} className="categoria-movimiento-item">
+                        <div className="categoria-mov-top">
+                          <span className="categoria-mov-fecha">
+                            {new Date(gasto.fecha).toLocaleDateString('es-AR')}
+                          </span>
+                          <span className="categoria-mov-quien">
+                            {gasto.usuario?.nombre}
+                          </span>
+                        </div>
+                        <div className="categoria-mov-desc">{gasto.descripcion}</div>
+                        <div className="categoria-mov-monto">-{formatCurrency(gasto.monto)}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
       </div>
 
       <button

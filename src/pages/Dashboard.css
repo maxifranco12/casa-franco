@@ -709,3 +709,31 @@
     height: 72px;
   }
 }
+
+.informe-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: calc(100% - 48px);
+  margin: 0 24px 16px;
+  padding: 14px;
+  background: linear-gradient(135deg, #2D3748 0%, #4A5568 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(45, 55, 72, 0.3);
+}
+
+.informe-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(45, 55, 72, 0.4);
+}
+
+.informe-btn:active {
+  transform: translateY(0);
+}

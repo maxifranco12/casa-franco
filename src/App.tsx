@@ -9,6 +9,7 @@ import GastosVariables from './pages/GastosVariables';
 import RegistrarMovimiento from './pages/RegistrarMovimiento';
 import Configuracion from './pages/Configuracion';
 import AsesorIA from './pages/AsesorIA';
+import Informe from './pages/Informe';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { currentUser } = useApp();
@@ -38,6 +39,7 @@ function AppRoutes() {
         <Route path="gastos" element={<GastosVariables />} />
         <Route path="registrar" element={<RegistrarMovimiento />} />
         <Route path="asesor" element={<AsesorIA />} />
+        <Route path="informe" element={<Informe />} />
         <Route path="config" element={<Configuracion />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
