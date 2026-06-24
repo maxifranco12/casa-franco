@@ -20,8 +20,20 @@ export default function Login() {
   const [resetEmail, setResetEmail] = useState('');
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [isRecovery, setIsRecovery] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      setIsRecovery(true);
+      setBackgroundImage('/image0.jpeg');
+      setReady(true);
+      return;
+    }
     init();
   }, []);
 
@@ -120,6 +132,37 @@ export default function Login() {
     setResetLoading(false);
   }
 
+  async function handleUpdatePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    setUpdateLoading(true);
+
+    if (newPassword !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      setUpdateLoading(false);
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      setUpdateLoading(false);
+      return;
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (updateError) {
+      setError('Error al actualizar la contraseña');
+    } else {
+      setPasswordUpdated(true);
+      window.location.hash = '';
+    }
+
+    setUpdateLoading(false);
+  }
+
   if (!ready) {
     return null;
   }
@@ -136,7 +179,51 @@ export default function Login() {
       <div className="login-content">
         <h1 className="login-title">Casa Franco</h1>
 
-        {hasFamilia ? (
+        {isRecovery ? (
+          <div className="login-recovery-form">
+            {error && <div className="login-error">{error}</div>}
+
+            {passwordUpdated ? (
+              <div className="login-reset-success">
+                Contraseña actualizada correctamente
+                <button
+                  className="login-auth-btn"
+                  style={{ marginTop: '16px' }}
+                  onClick={() => {
+                    setIsRecovery(false);
+                    setPasswordUpdated(false);
+                    setNewPassword('');
+                    setConfirmPassword('');
+                  }}
+                >
+                  Ir al login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleUpdatePassword} className="login-auth-form">
+                <input
+                  type="password"
+                  className="login-input"
+                  placeholder="Nueva contraseña"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  className="login-input"
+                  placeholder="Confirmar contraseña"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button type="submit" className="login-auth-btn" disabled={updateLoading}>
+                  {updateLoading ? 'Actualizando...' : 'Cambiar contraseña'}
+                </button>
+              </form>
+            )}
+          </div>
+        ) : hasFamilia ? (
           <div className="login-buttons">
             {users.map(user => (
               <button

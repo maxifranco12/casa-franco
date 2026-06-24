@@ -272,3 +272,9 @@
   border-color: #CBD5E0;
   background: #F7FAFC;
 }
+
+.login-recovery-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
