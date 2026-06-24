@@ -1,0 +1,154 @@
+.confirmacion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.confirmacion-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  width: 90%;
+  max-width: 450px;
+  animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.confirmacion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.confirmacion-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1A202C;
+  margin: 0;
+}
+
+.confirmacion-close {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #718096;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmacion-close:hover {
+  color: #1A202C;
+}
+
+.confirmacion-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.confirmacion-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.confirmacion-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4A5568;
+}
+
+.confirmacion-field input,
+.confirmacion-field select {
+  padding: 12px 14px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 15px;
+  background: white;
+  color: #1A202C;
+  transition: all 0.15s ease;
+}
+
+.confirmacion-field input:focus,
+.confirmacion-field select:focus {
+  border-color: #2D3748;
+  box-shadow: 0 0 0 3px rgba(45, 55, 72, 0.1);
+  outline: none;
+}
+
+.confirmacion-footer {
+  display: flex;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #E2E8F0;
+}
+
+.confirmacion-btn-cancel,
+.confirmacion-btn-confirm {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+.confirmacion-btn-cancel {
+  background: #F7FAFC;
+  color: #4A5568;
+}
+
+.confirmacion-btn-cancel:hover {
+  background: #EDF2F7;
+}
+
+.confirmacion-btn-confirm {
+  background: #F58432;
+  color: white;
+}
+
+.confirmacion-btn-confirm:hover {
+  background: #ED6C02;
+}
+
+.confirmacion-btn-cancel:active,
+.confirmacion-btn-confirm:active {
+  transform: scale(0.98);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translate(-50%, -45%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,116 @@
+export interface Usuario {
+  id: string;
+  nombre: string;
+  foto_url?: string | null;
+  familia_id?: string | null;
+  email?: string | null;
+  created_at: string;
+}
+
+export interface GastoFijoPlantilla {
+  id: string;
+  nombre: string;
+  monto_estimado: number;
+  dia_pago: string;
+  dia_vencimiento: number | null;
+  activo: boolean;
+  familia_id?: string | null;
+  created_at: string;
+  updated_at?: string;
+  diasRestantes?: number;
+}
+
+export interface HistorialPagoGastoFijo {
+  id: string;
+  plantilla_id: string;
+  monto: number;
+  fecha_pago: string;
+  medio_pago: string;
+  mes: number;
+  anio: number;
+  nota?: string | null;
+  registrado_por: string | null;
+  created_at: string;
+  usuario?: Usuario;
+}
+
+export interface GastoFijoMes {
+  id: string;
+  plantilla_id: string;
+  mes: number;
+  anio: number;
+  estado: 'PENDIENTE' | 'PAGADO';
+  monto_real: number | null;
+  fecha_pago: string | null;
+  medio_pago: string | null;
+  registrado_por: string | null;
+  familia_id?: string | null;
+  created_at: string;
+  updated_at: string;
+  plantilla?: GastoFijoPlantilla;
+  usuario?: Usuario;
+}
+
+export interface Movimiento {
+  id: string;
+  tipo: 'INGRESO' | 'EGRESO';
+  descripcion: string;
+  monto: number;
+  fecha: string;
+  categoria: string | null;
+  medio_pago: string;
+  quien_pago: string | null;
+  sale_de_caja: boolean;
+  nota: string | null;
+  comprobante_url: string | null;
+  registrado_por: string | null;
+  familia_id?: string | null;
+  created_at: string;
+  usuario?: Usuario;
+}
+
+export interface Configuracion {
+  id: string;
+  clave: string;
+  valor: string | null;
+  familia_id?: string | null;
+  updated_at: string;
+}
+
+export interface HistorialMes {
+  id: string;
+  familia_id: string;
+  mes: number;
+  anio: number;
+  total_gastado: number;
+  total_ingresado: number;
+  saldo_caja_cierre: number;
+  fijos_pagados: number;
+  fijos_pendientes: number;
+  presupuesto_asignado: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const MEDIOS_PAGO = [
+  'MP Maxi',
+  'MP Caro',
+  'Efectivo'
+] as const;
+
+export const CATEGORIAS_GASTOS = [
+  'Supermercado',
+  'Verdulería',
+  'Carnicería',
+  'Kasher',
+  'Farmacia',
+  'Dietética',
+  'Salidas en familia',
+  'Combustible',
+  'Limpieza',
+  'Servicios',
+  'Escuela',
+  'Salud',
+  'Donaciones',
+  'Gastos varios'
+] as const;

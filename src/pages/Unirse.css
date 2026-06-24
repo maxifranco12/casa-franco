@@ -1,0 +1,124 @@
+.unirse-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%);
+  padding: 24px;
+}
+
+.unirse-card {
+  background: white;
+  border-radius: 16px;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.unirse-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2D3748;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.unirse-family-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #38A169;
+  margin-bottom: 24px;
+}
+
+.unirse-subtitle {
+  font-size: 15px;
+  color: #718096;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.unirse-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.unirse-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.unirse-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4A5568;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.unirse-field input {
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid #E2E8F0;
+  border-radius: 10px;
+  transition: border-color 0.2s ease;
+  color: #2D3748;
+  font-weight: 500;
+}
+
+.unirse-field input:focus {
+  outline: none;
+  border-color: #2D3748;
+}
+
+.unirse-field input::placeholder {
+  color: #A0AEC0;
+  font-weight: 400;
+}
+
+.unirse-submit {
+  padding: 16px;
+  background: #38A169;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.unirse-submit:hover {
+  background: #2F855A;
+  transform: translateY(-1px);
+}
+
+.unirse-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.unirse-error {
+  background: #FED7D7;
+  color: #9B2C2C;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.unirse-invalid {
+  text-align: center;
+  color: #718096;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.unirse-invalid h2 {
+  color: #E53E3E;
+  margin-bottom: 12px;
+}

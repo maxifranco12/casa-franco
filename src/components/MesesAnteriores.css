@@ -1,0 +1,156 @@
+.meses-anteriores {
+  margin-top: 40px;
+  padding: 0 20px 80px;
+}
+
+.meses-anteriores-titulo {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 20px;
+  letter-spacing: -0.02em;
+}
+
+.meses-anteriores-loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.meses-anteriores-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .meses-anteriores-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .meses-anteriores-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.mes-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px var(--shadow);
+  transition: all 0.2s ease;
+}
+
+.mes-card:hover {
+  box-shadow: 0 4px 6px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.mes-card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, rgba(245, 132, 50, 0.85) 100%);
+  padding: 16px 20px;
+}
+
+.mes-card-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.mes-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mes-stat-principal {
+  text-align: center;
+  padding: 12px 0;
+  border-bottom: 2px solid var(--border);
+}
+
+.mes-stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.mes-stat-valor-grande {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.03em;
+}
+
+.mes-presupuesto-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mes-presupuesto-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.mes-presupuesto-info .excedido {
+  color: #F56565;
+  font-weight: 700;
+}
+
+.mes-presupuesto-barra {
+  height: 8px;
+  background: var(--background);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mes-presupuesto-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary) 0%, rgba(245, 132, 50, 0.85) 100%);
+  transition: width 0.3s ease;
+}
+
+.mes-presupuesto-fill.excedido {
+  background: linear-gradient(90deg, #F56565 0%, #FC8181 100%);
+}
+
+.mes-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mes-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mes-stat-valor {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.mes-stat-valor.ahorro {
+  color: #48BB78;
+}
+
+.mes-stat-valor.deficit {
+  color: #F56565;
+}
