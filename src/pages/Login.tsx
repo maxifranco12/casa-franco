@@ -11,20 +11,13 @@ export default function Login() {
   const [backgroundImage, setBackgroundImage] = useState<string>('');
   const [users, setUsers] = useState<Usuario[]>([]);
   const [ready, setReady] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [hasFamilia, setHasFamilia] = useState(false);
-  const [showReset, setShowReset] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [resetSent, setResetSent] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -79,57 +72,6 @@ export default function Login() {
   function handleUserSelect(user: Usuario) {
     setCurrentUser(user);
     navigate('/');
-  }
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (authError) {
-      setError('Email o contraseña incorrectos');
-      setLoading(false);
-      return;
-    }
-
-    if (data.user) {
-      const { data: userData } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('auth_id', data.user.id)
-        .single();
-
-      if (userData) {
-        localStorage.setItem('familia_id', userData.familia_id);
-        setCurrentUser(userData);
-        navigate('/');
-      } else {
-        setError('Usuario no encontrado');
-      }
-    }
-
-    setLoading(false);
-  }
-
-  async function handleResetPassword(e: React.FormEvent) {
-    e.preventDefault();
-    setResetLoading(true);
-    setError('');
-
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(resetEmail);
-
-    if (resetError) {
-      setError('Error al enviar el email');
-    } else {
-      setResetSent(true);
-    }
-
-    setResetLoading(false);
   }
 
   async function handleUpdatePassword(e: React.FormEvent) {
@@ -239,81 +181,14 @@ export default function Login() {
             ))}
           </div>
         ) : (
-          <>
-            {error && <div className="login-error">{error}</div>}
-
-            <form className="login-auth-form" onSubmit={handleLogin}>
-              <input
-                type="email"
-                className="login-input"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <input
-                type="password"
-                className="login-input"
-                placeholder="Contrasena"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button type="submit" className="login-auth-btn" disabled={loading}>
-                {loading ? 'Iniciando...' : 'Iniciar sesion'}
-              </button>
-              <button
-                type="button"
-                className="login-forgot-link"
-                onClick={() => setShowReset(true)}
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
-            </form>
-
-            <div className="login-divider">o</div>
-
+          <div className="login-new-family">
             <button
               className="login-register-btn"
               onClick={() => navigate('/registro')}
             >
               Crear nueva familia
             </button>
-
-            {showReset && (
-              <div className="login-reset-overlay">
-                <div className="login-reset-modal">
-                  {resetSent ? (
-                    <p className="login-reset-success">Revisá tu email para cambiar la contraseña</p>
-                  ) : (
-                    <form onSubmit={handleResetPassword} className="login-reset-form">
-                      <label className="login-reset-label">Email</label>
-                      <input
-                        type="email"
-                        className="login-input"
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        required
-                      />
-                      <button type="submit" className="login-auth-btn" disabled={resetLoading}>
-                        {resetLoading ? 'Enviando...' : 'Enviar link de reset'}
-                      </button>
-                    </form>
-                  )}
-                  <button
-                    className="login-reset-close"
-                    onClick={() => {
-                      setShowReset(false);
-                      setResetSent(false);
-                      setResetEmail('');
-                    }}
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
+          </div>
         )}
       </div>
     </div>
