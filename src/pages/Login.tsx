@@ -19,11 +19,7 @@ export default function Login() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-  if (!localStorage.getItem('familia_id')) {
-    localStorage.setItem('familia_id', '68c65ee4-e11c-4603-ba6a-279553d66078');
-  }
-}, []);
+ 
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -37,8 +33,12 @@ export default function Login() {
   }, []);
 
   async function init() {
-    const familiaId = localStorage.getItem('familia_id');
-    setHasFamilia(!!familiaId);
+  let familiaId = localStorage.getItem('familia_id');
+if (!familiaId) {
+  familiaId = '68c65ee4-e11c-4603-ba6a-279553d66078';
+  localStorage.setItem('familia_id', familiaId);
+}
+setHasFamilia(!!familiaId);
 
     if (familiaId) {
       await Promise.all([cargarFotoInicio(familiaId), cargarUsuarios(familiaId)]);
